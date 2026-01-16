@@ -29,6 +29,9 @@
         "title": "Whale Space",
         "width": 1200,
         "height": 700,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "decorations": false,
         "resizable": true
       }
@@ -38,4 +41,3 @@
     }
   }
 }
-

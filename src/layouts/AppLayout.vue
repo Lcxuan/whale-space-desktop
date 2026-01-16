@@ -45,7 +45,10 @@ const route = useRoute()
 
 const activeMenu = computed(() => route.path)
 
-const asideWidth = ref(180)
+const ASIDE_MIN_WIDTH = 200
+const ASIDE_MAX_WIDTH = 320
+
+const asideWidth = ref(ASIDE_MIN_WIDTH)
 const isResizing = ref(false)
 
 const shellStyle = computed<CSSProperties>(() => ({
@@ -84,7 +87,7 @@ function onResizeStart(e: MouseEvent) {
 
   const onMove = (ev: MouseEvent) => {
     const next = startWidth + (ev.clientX - startX)
-    asideWidth.value = clamp(Math.round(next), 200, 300)
+    asideWidth.value = clamp(Math.round(next), ASIDE_MIN_WIDTH, ASIDE_MAX_WIDTH)
   }
 
   const onUp = () => {
@@ -102,7 +105,7 @@ function onResizeStart(e: MouseEvent) {
 onMounted(() => {
   const cached = Number(localStorage.getItem('ws_aside_width'))
   if (Number.isFinite(cached) && cached > 0) {
-    asideWidth.value = clamp(Math.round(cached), 200, 320)
+    asideWidth.value = clamp(Math.round(cached), ASIDE_MIN_WIDTH, ASIDE_MAX_WIDTH)
   }
 })
 
@@ -169,4 +172,3 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 </style>
-
