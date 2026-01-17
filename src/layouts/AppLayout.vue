@@ -3,23 +3,41 @@
     <WindowTitleBar />
     <el-container class="ws-body">
       <el-aside width="var(--ws-aside-width)" class="ws-aside">
-        <el-menu :default-active="activeMenu" router class="ws-menu">
-          <el-menu-item index="/">
-            <el-icon><HomeFilled /></el-icon>
-            <span>开始</span>
-          </el-menu-item>
-          <el-menu-item index="/docs">
-            <el-icon><Document /></el-icon>
-            <span>文档</span>
-          </el-menu-item>
-          <el-menu-item index="/settings">
-            <el-icon><Setting /></el-icon>
-            <span>设置</span>
-          </el-menu-item>
-        </el-menu>
+        <div class="ws-aside__inner">
+          <el-menu :default-active="activeMenu" router class="ws-menu">
+            <el-menu-item index="/">
+              <el-icon><HomeFilled /></el-icon>
+              <span>开始</span>
+            </el-menu-item>
+            <el-menu-item index="/docs">
+              <el-icon><Document /></el-icon>
+              <span>文档</span>
+            </el-menu-item>
+          </el-menu>
+
+          <div class="ws-aside__footer">
+            <button
+              ref="moreButtonEl"
+              type="button"
+              class="ws-more-button"
+              :class="{ 'is-open': isMoreOpen }"
+              @click="toggleMore"
+            >
+              <el-icon><MoreFilled /></el-icon>
+              <span>更多</span>
+            </button>
+          </div>
+        </div>
       </el-aside>
       <!-- 拖拽分割条：用于调整侧边栏宽度 -->
       <div class="ws-splitter" @mousedown="onResizeStart" />
+
+      <div v-if="isMoreOpen" ref="morePanelEl" class="ws-more-panel">
+        <button type="button" class="ws-more-panel__item" @click="goSettings">
+          <el-icon><Setting /></el-icon>
+          <span>设置</span>
+        </button>
+      </div>
 
       <el-container>
         <el-main :class="['ws-main', { 'ws-main--no-scroll': isHome }]">
@@ -32,14 +50,19 @@
 
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import WindowTitleBar from '../components/WindowTitleBar.vue'
-import { Document, HomeFilled, Setting } from '@element-plus/icons-vue'
+import { Document, HomeFilled, MoreFilled, Setting } from '@element-plus/icons-vue'
 
 const route = useRoute()
+const router = useRouter()
 
-const activeMenu = computed(() => route.path)
+
+const activeMenu = computed(() => {
+  if (route.path === '/' || route.path === '/docs') return route.path
+  return ''
+})
 
 // 侧边栏允许拖拽的宽度范围
 const ASIDE_MIN_WIDTH = 200
@@ -52,6 +75,11 @@ const isResizing = ref(false)
 const shellStyle = computed<CSSProperties>(() => ({
   '--ws-aside-width': `${asideWidth.value}px`,
 }))
+
+// 更多按钮设置
+const isMoreOpen = ref(false)
+const moreButtonEl = ref<HTMLElement | null>(null)
+const morePanelEl = ref<HTMLElement | null>(null)
 
 // 首页主区域不滚动，避免出现“内容区 + 内层滚动条”的双滚动体验
 const isHome = computed(() => route.name === 'home')
@@ -67,6 +95,32 @@ const title = computed(() => {
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n))
+}
+
+// 切换“更多”弹窗显隐
+function toggleMore() {
+  isMoreOpen.value = !isMoreOpen.value
+}
+
+// 点击弹窗内后跳转，并收起弹窗
+function goSettings() {
+  isMoreOpen.value = false
+  router.push('/settings')
+}
+
+// 全局捕获鼠标按下：点击弹窗/按钮之外的区域时，自动收起弹窗
+function onGlobalMouseDown(e: MouseEvent) {
+  // 如果弹窗未打开，直接返回
+  if (!isMoreOpen.value) return
+  const target = e.target as Node | null
+  // 如果事件目标为空，直接返回
+  if (!target) return
+  // 如果点击的是“更多”按钮本身，不关闭弹窗
+  if (moreButtonEl.value?.contains(target)) return
+  // 如果点击的是弹窗内部，不关闭弹窗
+  if (morePanelEl.value?.contains(target)) return
+  // 其余情况：点击外部，关闭弹窗
+  isMoreOpen.value = false
 }
 
 // 拖拽侧栏时，统一设置全局光标与选中文本行为，避免拖动过程中误选中页面内容
@@ -110,13 +164,25 @@ onMounted(() => {
   if (Number.isFinite(cached) && cached > 0) {
     asideWidth.value = clamp(Math.round(cached), ASIDE_MIN_WIDTH, ASIDE_MAX_WIDTH)
   }
+
+  // 使用 capture 以尽可能早地接收到事件，保证“点击外部关闭”行为稳定
+  window.addEventListener('mousedown', onGlobalMouseDown, true)
 })
 
 onBeforeUnmount(() => {
   // 如果组件卸载时仍处于拖拽态，确保全局样式被正确还原
+  window.removeEventListener('mousedown', onGlobalMouseDown, true)
   if (!isResizing.value) return
   setBodyResizing(false)
 })
+
+watch(
+  () => route.path,
+  () => {
+    // 路由切换时兜底收起弹窗，避免弹窗残留在新页面
+    isMoreOpen.value = false
+  },
+)
 </script>
 
 <style scoped lang="scss">
@@ -129,6 +195,7 @@ onBeforeUnmount(() => {
 .ws-body {
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
 .ws-aside {
@@ -137,6 +204,12 @@ onBeforeUnmount(() => {
   width: var(--ws-aside-width) !important;
   border-right: 1px solid var(--el-border-color);
   background: var(--el-bg-color);
+}
+
+.ws-aside__inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .ws-splitter {
@@ -151,6 +224,7 @@ onBeforeUnmount(() => {
 .ws-menu {
   border-right: none;
   padding: 8px;
+  flex: 1;
 }
 
 :deep(.ws-menu .el-menu-item) {
@@ -169,6 +243,66 @@ onBeforeUnmount(() => {
 }
 
 :deep(.ws-menu .el-menu-item:not(.is-active):hover) {
+  background: var(--el-fill-color);
+}
+
+.ws-aside__footer {
+  padding: 8px;
+}
+
+.ws-more-button {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  margin: 4px 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+}
+
+.ws-more-button:hover {
+  background: var(--el-fill-color);
+}
+
+.ws-more-button.is-open {
+  background: var(--el-fill-color-light);
+}
+
+.ws-more-panel {
+  position: absolute;
+  left: calc(var(--ws-aside-width) + 8px);
+  bottom: 12px;
+  width: 220px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
+  box-shadow: var(--el-box-shadow-light);
+  z-index: 50;
+}
+
+.ws-more-panel__item {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+}
+
+.ws-more-panel__item:hover {
   background: var(--el-fill-color);
 }
 
