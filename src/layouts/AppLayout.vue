@@ -164,7 +164,7 @@ onBeforeUnmount(() => {
 }
 
 .ws-main {
-  padding: 16px;
+  padding: 0 16px 16px;
   min-height: 0;
 }
 

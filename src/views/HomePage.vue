@@ -39,7 +39,6 @@
     <div class="ws-start__recent">
       <div class="ws-start__section">
         <div class="ws-start__section-title">最近访问</div>
-        <el-button link type="primary" @click="goDocs">查看全部</el-button>
       </div>
       <div class="ws-start__recent-scroll">
         <RecentList />
@@ -59,10 +58,6 @@ const router = useRouter()
 const docsStore = useDocsStore()
 
 type CreateKind = 'doc' | 'sheet' | 'board' | 'db'
-
-function goDocs() {
-  router.push('/docs')
-}
 
 function createDoc(kind: CreateKind) {
   const defaultTitle =
@@ -131,7 +126,7 @@ function createKnowledgeBase() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .ws-start__section-title {
