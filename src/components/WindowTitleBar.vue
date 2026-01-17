@@ -1,5 +1,7 @@
+<!-- 组件：窗口标题栏 -->
 <template>
   <div class="ws-titlebar">
+    <!-- 可拖拽区域：在 Tauri 窗口中用于拖动/双击最大化 -->
     <div class="ws-titlebar__drag" data-tauri-drag-region @dblclick="onToggleMaximize">
       <div class="ws-titlebar__left" data-tauri-drag-region>
         <div class="ws-titlebar__brand">
@@ -36,6 +38,8 @@ import { appWindow } from '@tauri-apps/api/window'
 import { Close, FullScreen, Minus } from '@element-plus/icons-vue'
 import ThemeToggle from './ThemeToggle.vue'
 
+// 兼容“网页模式”(vite dev/preview) 与 “桌面模式”(Tauri)：
+// 非 Tauri 环境不渲染窗口控制按钮，也不调用 appWindow API
 const isTauri = computed(() => Boolean((window as any).__TAURI__))
 
 async function onMinimize() {
@@ -72,6 +76,7 @@ async function onClose() {
 }
 
 .ws-titlebar__left {
+  /* 与侧边栏保持一致宽度，避免分割线/布局出现错位（由 AppLayout 下发 --ws-aside-width） */
   width: var(--ws-aside-width);
   box-sizing: border-box;
   height: 100%;

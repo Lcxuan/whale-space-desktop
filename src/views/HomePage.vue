@@ -1,3 +1,4 @@
+<!-- 开始页 -->
 <template>
   <div class="ws-start">
     <div class="ws-start__title">开始</div>
@@ -69,6 +70,7 @@ function createDoc(kind: CreateKind) {
           ? '未命名数据表'
           : '未命名文档'
 
+  // 创建并立即记录一次访问
   const doc = docsStore.create(defaultTitle)
   docsStore.touchVisit(doc.id)
   router.push(`/editor/${doc.id}`)

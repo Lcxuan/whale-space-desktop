@@ -1,3 +1,4 @@
+<!-- 设置页 -->
 <template>
   <el-card>
     <template #header>
@@ -38,4 +39,3 @@ const mode = computed<ThemeMode>({
   }
 })
 </script>
-

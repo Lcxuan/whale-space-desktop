@@ -1,3 +1,4 @@
+<!-- 组件：最近文档列表 -->
 <template>
   <el-empty v-if="items.length === 0" description="暂无记录" />
   <el-table v-else :data="items" size="large" height="100%" style="width: 100%" @row-click="onOpen">
@@ -31,12 +32,14 @@ const router = useRouter()
 const docsStore = useDocsStore()
 
 onMounted(() => {
+  // 进入页面时加载文档列表
   docsStore.load()
 })
 
 const items = computed(() => docsStore.recentDocs)
 
 function onOpen(row: DocEntity) {
+  // 打开前先记录一次“最近访问”，保证列表与时间戳及时刷新
   docsStore.touchVisit(row.id)
   router.push(`/editor/${row.id}`)
 }

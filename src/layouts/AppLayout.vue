@@ -18,14 +18,10 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
+      <!-- 拖拽分割条：用于调整侧边栏宽度 -->
       <div class="ws-splitter" @mousedown="onResizeStart" />
 
       <el-container>
-        <el-header v-if="showPageHeader" height="42px" class="ws-header">
-          <div class="ws-header__left">
-            <el-text class="ws-header__path">{{ title }}</el-text>
-          </div>
-        </el-header>
         <el-main :class="['ws-main', { 'ws-main--no-scroll': isHome }]">
           <router-view />
         </el-main>
@@ -45,9 +41,11 @@ const route = useRoute()
 
 const activeMenu = computed(() => route.path)
 
+// 侧边栏允许拖拽的宽度范围
 const ASIDE_MIN_WIDTH = 200
 const ASIDE_MAX_WIDTH = 320
 
+// 用于保证标题栏左侧与侧栏对齐
 const asideWidth = ref(ASIDE_MIN_WIDTH)
 const isResizing = ref(false)
 
@@ -55,9 +53,10 @@ const shellStyle = computed<CSSProperties>(() => ({
   '--ws-aside-width': `${asideWidth.value}px`,
 }))
 
+// 首页主区域不滚动，避免出现“内容区 + 内层滚动条”的双滚动体验
 const isHome = computed(() => route.name === 'home')
-const showPageHeader = computed(() => route.name === 'editor')
 
+// 页面标题：用于 header 展示，也可作为后续面包屑/路由元信息的兜底
 const title = computed(() => {
   if (route.name === 'home') return '开始'
   if (route.name === 'docs') return '文档'
@@ -70,6 +69,7 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n))
 }
 
+// 拖拽侧栏时，统一设置全局光标与选中文本行为，避免拖动过程中误选中页面内容
 function setBodyResizing(active: boolean) {
   if (!document?.body) return
   document.body.style.cursor = active ? 'col-resize' : ''
@@ -77,6 +77,7 @@ function setBodyResizing(active: boolean) {
 }
 
 function onResizeStart(e: MouseEvent) {
+  // 仅响应鼠标左键拖拽
   if (e.button !== 0) return
   e.preventDefault()
 
@@ -95,6 +96,7 @@ function onResizeStart(e: MouseEvent) {
     setBodyResizing(false)
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
+    // 记住用户调整后的宽度，刷新/重启后仍保持一致
     localStorage.setItem('ws_aside_width', String(asideWidth.value))
   }
 
@@ -103,6 +105,7 @@ function onResizeStart(e: MouseEvent) {
 }
 
 onMounted(() => {
+  // 启动时回放上次保存的侧栏宽度
   const cached = Number(localStorage.getItem('ws_aside_width'))
   if (Number.isFinite(cached) && cached > 0) {
     asideWidth.value = clamp(Math.round(cached), ASIDE_MIN_WIDTH, ASIDE_MAX_WIDTH)
@@ -110,6 +113,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  // 如果组件卸载时仍处于拖拽态，确保全局样式被正确还原
   if (!isResizing.value) return
   setBodyResizing(false)
 })

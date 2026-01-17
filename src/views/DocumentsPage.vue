@@ -1,3 +1,4 @@
+<!-- 文档列表页 -->
 <template>
   <el-card>
     <template #header>
@@ -50,6 +51,7 @@ const router = useRouter()
 const keyword = ref('')
 
 onMounted(() => {
+  // 进入列表页时加载文档数据（从存储回放到 store）
   docsStore.load()
 })
 
@@ -65,6 +67,7 @@ function createDoc() {
 }
 
 function onOpen(row: DocEntity) {
+  // 打开前记录一次访问时间
   docsStore.touchVisit(row.id)
   router.push(`/editor/${row.id}`)
 }

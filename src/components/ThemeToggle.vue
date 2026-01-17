@@ -1,3 +1,4 @@
+<!-- 组件：主题切换按钮 -->
 <template>
   <el-button :icon="icon" @click="onToggle" circle />
 </template>
@@ -15,4 +16,3 @@ function onToggle() {
   appStore.toggleTheme()
 }
 </script>
-

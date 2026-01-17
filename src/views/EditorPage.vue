@@ -1,3 +1,4 @@
+<!-- 文档编辑页 -->
 <template>
   <el-card>
     <template #header>
@@ -42,8 +43,10 @@ const title = ref('')
 const content = ref('')
 
 function syncFromStore() {
+  // 从 store 回放到编辑器本地状态；切换文档/刷新后需要重新同步
   const d = docsStore.getById(props.id)
   if (!d) return
+  // 打开编辑器即算一次访问
   docsStore.touchVisit(d.id)
   title.value = d.title
   content.value = d.content
@@ -58,6 +61,7 @@ onMounted(() => {
 watch(
   () => props.id,
   () => {
+    // 切换路由参数时重新加载并同步
     docsStore.load()
     syncFromStore()
   }
@@ -65,6 +69,7 @@ watch(
 
 const doc = computed(() => docsStore.getById(props.id))
 
+// 内容保存采用防抖：连续输入时降低写入频率
 const persist = debounce(() => {
   if (!doc.value) return
   docsStore.updateContent(doc.value.id, content.value)
@@ -73,12 +78,14 @@ const persist = debounce(() => {
 
 watch(content, () => {
   if (!doc.value) return
+  // 任意内容变更先标记为编辑中，再触发防抖保存
   saveState.value = 'editing'
   persist()
 })
 
 function onTitleCommit() {
   if (!doc.value) return
+  // 标题提交时做 trim，并兜底未命名
   docsStore.rename(doc.value.id, title.value.trim() || '未命名文档')
 }
 
