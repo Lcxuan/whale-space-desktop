@@ -44,6 +44,7 @@ const content = ref('')
 function syncFromStore() {
   const d = docsStore.getById(props.id)
   if (!d) return
+  docsStore.touchVisit(d.id)
   title.value = d.title
   content.value = d.content
   saveState.value = 'saved'
@@ -99,4 +100,3 @@ function back() {
   gap: 12px;
 }
 </style>
-

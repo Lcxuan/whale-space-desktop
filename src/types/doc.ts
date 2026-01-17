@@ -6,5 +6,5 @@ export interface DocEntity {
   content: string
   createdAt: number
   updatedAt: number
+  lastVisitedAt: number
 }
-

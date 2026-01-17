@@ -65,6 +65,7 @@ function createDoc() {
 }
 
 function onOpen(row: DocEntity) {
+  docsStore.touchVisit(row.id)
   router.push(`/editor/${row.id}`)
 }
 
@@ -100,4 +101,3 @@ async function onDelete(row: DocEntity) {
   justify-content: space-between;
 }
 </style>
-

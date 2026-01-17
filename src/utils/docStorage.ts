@@ -11,12 +11,20 @@ function normalizeDocs(input: unknown): DocEntity[] {
       if (!item || typeof item !== 'object') return null
       const obj = item as Partial<DocEntity>
       if (!obj.id || !obj.title) return null
+      const createdAt = typeof obj.createdAt === 'number' ? obj.createdAt : Date.now()
+      const updatedAt = typeof obj.updatedAt === 'number' ? obj.updatedAt : Date.now()
       return {
         id: String(obj.id),
         title: String(obj.title),
         content: typeof obj.content === 'string' ? obj.content : '',
-        createdAt: typeof obj.createdAt === 'number' ? obj.createdAt : Date.now(),
-        updatedAt: typeof obj.updatedAt === 'number' ? obj.updatedAt : Date.now()
+        createdAt,
+        updatedAt,
+        lastVisitedAt:
+          typeof obj.lastVisitedAt === 'number'
+            ? obj.lastVisitedAt
+            : typeof obj.updatedAt === 'number'
+              ? updatedAt
+              : createdAt
       } satisfies DocEntity
     })
     .filter((x): x is DocEntity => Boolean(x))
@@ -39,7 +47,8 @@ export const docStorage = {
       title: input.title,
       content: input.content ?? '',
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      lastVisitedAt: now
     }
     const docs = this.loadAll()
     docs.unshift(doc)
@@ -59,9 +68,19 @@ export const docStorage = {
     this.saveAll(docs)
   },
 
+  touch(id: DocId) {
+    const docs = this.loadAll()
+    const idx = docs.findIndex((d) => d.id === id)
+    if (idx < 0) return
+    docs[idx] = {
+      ...docs[idx],
+      lastVisitedAt: Date.now()
+    }
+    this.saveAll(docs)
+  },
+
   remove(id: DocId) {
     const docs = this.loadAll().filter((d) => d.id !== id)
     this.saveAll(docs)
   }
 }
-

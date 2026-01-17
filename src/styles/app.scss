@@ -1,3 +1,27 @@
+@font-face {
+  font-family: 'WS Source Han Sans SC';
+  src: url('../assets/fonts/SourceHanSansSC-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'WS Source Han Sans SC';
+  src: url('../assets/fonts/SourceHanSansSC-Regular.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'WS Source Han Sans SC';
+  src: url('../assets/fonts/SourceHanSansSC-Regular.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 html,
 body {
   height: 100%;
@@ -8,11 +32,17 @@ body {
   margin: 0;
   background: transparent;
   color: var(--el-text-color-primary);
+  font-family: var(--ws-font-family);
+  font-weight: 400;
 }
 
 :root {
   --ws-aside-width: 200px;
   --ws-window-radius: 0px;
+  --ws-font-family: 'WS Source Han Sans SC', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
+    Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --el-font-family: var(--ws-font-family);
+  --el-font-weight-primary: 400;
 }
 
 #app {

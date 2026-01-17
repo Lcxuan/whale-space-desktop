@@ -75,6 +75,7 @@ function createDoc(kind: CreateKind) {
           : '未命名文档'
 
   const doc = docsStore.create(defaultTitle)
+  docsStore.touchVisit(doc.id)
   router.push(`/editor/${doc.id}`)
 }
 

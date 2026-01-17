@@ -2,6 +2,16 @@
   <el-empty v-if="items.length === 0" description="暂无记录" />
   <el-table v-else :data="items" size="large" height="100%" style="width: 100%" @row-click="onOpen">
     <el-table-column prop="title" label="标题" />
+    <el-table-column label="创建时间" width="160">
+      <template #default="{ row }">
+        <el-text type="info">{{ formatTime(row.createdAt) }}</el-text>
+      </template>
+    </el-table-column>
+    <el-table-column label="最近访问" width="160">
+      <template #default="{ row }">
+        <el-text type="info">{{ formatTime(row.lastVisitedAt) }}</el-text>
+      </template>
+    </el-table-column>
     <el-table-column label="更新时间" width="160">
       <template #default="{ row }">
         <el-text type="info">{{ formatTime(row.updatedAt) }}</el-text>
@@ -27,6 +37,7 @@ onMounted(() => {
 const items = computed(() => docsStore.recentDocs)
 
 function onOpen(row: DocEntity) {
+  docsStore.touchVisit(row.id)
   router.push(`/editor/${row.id}`)
 }
 </script>
@@ -52,4 +63,3 @@ function onOpen(row: DocEntity) {
   font-size: 14px;
 }
 </style>
-

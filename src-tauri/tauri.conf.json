@@ -32,7 +32,8 @@
       {
         "title": "Whale Space",
         "width": 1200,
-        "height": 700,
+        "height": 800,
+        "center": true,
         "transparent": true,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,

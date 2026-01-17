@@ -10,7 +10,9 @@ export const useDocsStore = defineStore('docs', () => {
     return [...docs.value].sort((a, b) => b.updatedAt - a.updatedAt)
   })
 
-  const recentDocs = computed(() => sortedDocs.value.slice(0, 8))
+  const recentDocs = computed(() => {
+    return [...docs.value].sort((a, b) => b.lastVisitedAt - a.lastVisitedAt).slice(0, 8)
+  })
 
   function load() {
     docs.value = docStorage.loadAll()
@@ -32,6 +34,11 @@ export const useDocsStore = defineStore('docs', () => {
     docs.value = docStorage.loadAll()
   }
 
+  function touchVisit(id: DocId) {
+    docStorage.touch(id)
+    docs.value = docStorage.loadAll()
+  }
+
   function remove(id: DocId) {
     docStorage.remove(id)
     docs.value = docStorage.loadAll()
@@ -49,8 +56,8 @@ export const useDocsStore = defineStore('docs', () => {
     create,
     rename,
     updateContent,
+    touchVisit,
     remove,
     getById
   }
 })
-
