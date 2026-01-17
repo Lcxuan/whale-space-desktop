@@ -146,7 +146,26 @@ onBeforeUnmount(() => {
 
 .ws-menu {
   border-right: none;
-  padding-top: 0;
+  padding: 8px;
+}
+
+:deep(.ws-menu .el-menu-item) {
+  height: 42px;
+  padding: 0 14px;
+  margin: 4px 0;
+  border-radius: 10px;
+}
+
+:deep(.ws-menu .el-menu-item .el-icon) {
+  margin-right: 8px;
+}
+
+:deep(.ws-menu .el-menu-item.is-active) {
+  background: var(--el-fill-color-light);
+}
+
+:deep(.ws-menu .el-menu-item:not(.is-active):hover) {
+  background: var(--el-fill-color);
 }
 
 .ws-header {
