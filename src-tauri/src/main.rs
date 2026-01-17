@@ -6,6 +6,10 @@ fn main() {
       {
         use tauri::Manager;
         for window in _app.windows().values() {
+          #[cfg(any(windows, target_os = "macos"))]
+          {
+            let _ = window_shadows::set_shadow(window, true);
+          }
           apply_adaptive_window_size(window);
           ensure_startup_centered(window);
         }

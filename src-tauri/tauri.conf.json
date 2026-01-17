@@ -34,7 +34,7 @@
         "width": 1200,
         "height": 800,
         "center": true,
-        "transparent": true,
+        "transparent": false,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "decorations": false,
