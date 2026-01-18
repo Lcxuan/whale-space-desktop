@@ -1,44 +1,49 @@
 <!-- 文档编辑页 -->
 <template>
-  <el-card>
-    <template #header>
-      <div class="ws-header">
-        <el-input v-model="title" placeholder="输入标题" @change="onTitleCommit" />
-        <el-space>
-          <el-tag v-if="saveState === 'saved'" type="success">已保存</el-tag>
-          <el-tag v-else type="info">编辑中…</el-tag>
-          <el-button @click="back">返回</el-button>
-        </el-space>
+  <div v-if="!doc" class="ws-empty">
+    <el-empty description="文档不存在" />
+  </div>
+
+  <div v-else class="ws-doc">
+    <div class="ws-doc__inner">
+      <div class="ws-doc__header">
+        <div class="ws-doc__title-wrap">
+          <el-input v-model="title" class="ws-doc__title-input" placeholder="未命名文档" @change="onTitleCommit" />
+        </div>
+
+        <div class="ws-doc__meta">
+          <el-avatar :size="22" class="ws-doc__avatar">
+            {{ avatarText }}
+          </el-avatar>
+          <span class="ws-doc__author">{{ authorName }}</span>
+          <span class="ws-doc__meta-sep">|</span>
+          <span class="ws-doc__time">{{ updatedLabel }}</span>
+        </div>
       </div>
-    </template>
 
-    <div v-if="!doc" class="ws-empty">
-      <el-empty description="文档不存在" />
+      <div class="ws-doc__editor">
+        <el-input
+          v-model="content"
+          type="textarea"
+          :autosize="{ minRows: 18 }"
+          class="ws-doc__content"
+          placeholder="输入内容（支持基础 Markdown）"
+        />
+      </div>
     </div>
-
-    <div v-else class="ws-editor">
-      <el-input
-        v-model="content"
-        type="textarea"
-        :autosize="{ minRows: 18 }"
-        placeholder="支持 Markdown（当前为基础编辑器，后续可替换为富文本/协同编辑）"
-      />
-    </div>
-  </el-card>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useDocsStore } from '../stores/docs'
 import { debounce } from '../utils/debounce'
+import { formatTime } from '../utils/time'
 
 const props = defineProps<{ id: string }>()
 
-const router = useRouter()
 const docsStore = useDocsStore()
 
-const saveState = ref<'editing' | 'saved'>('saved')
 const title = ref('')
 const content = ref('')
 
@@ -50,7 +55,6 @@ function syncFromStore() {
   docsStore.touchVisit(d.id)
   title.value = d.title
   content.value = d.content
-  saveState.value = 'saved'
 }
 
 onMounted(() => {
@@ -69,17 +73,29 @@ watch(
 
 const doc = computed(() => docsStore.getById(props.id))
 
+const authorName = computed(() => {
+  const stored = localStorage.getItem('ws_user_name')
+  return stored?.trim() || '我'
+})
+
+const avatarText = computed(() => {
+  const t = authorName.value.trim()
+  return t.slice(0, 1).toUpperCase()
+})
+
+const updatedLabel = computed(() => {
+  if (!doc.value) return ''
+  return `${formatTime(doc.value.updatedAt)} 修改`
+})
+
 // 内容保存采用防抖：连续输入时降低写入频率
 const persist = debounce(() => {
   if (!doc.value) return
   docsStore.updateContent(doc.value.id, content.value)
-  saveState.value = 'saved'
 }, 350)
 
 watch(content, () => {
   if (!doc.value) return
-  // 任意内容变更先标记为编辑中，再触发防抖保存
-  saveState.value = 'editing'
   persist()
 })
 
@@ -88,22 +104,91 @@ function onTitleCommit() {
   // 标题提交时做 trim，并兜底未命名
   docsStore.rename(doc.value.id, title.value.trim() || '未命名文档')
 }
-
-function back() {
-  router.push('/docs')
-}
 </script>
 
 <style scoped>
-.ws-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
+.ws-doc {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  background: var(--el-bg-color);
 }
 
-.ws-editor {
-  display: grid;
-  gap: 12px;
+.ws-doc__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 28px 80px;
 }
+
+.ws-doc__header {
+  margin-bottom: 22px;
+}
+
+.ws-doc__title {
+  margin: 0;
+  text-align: left;
+  font-size: 34px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+}
+
+.ws-doc__title-wrap {
+  display: flex;
+  justify-content: flex-start;
+}
+
+:deep(.ws-doc__title-input) {
+  width: 100%;
+}
+
+:deep(.ws-doc__title-input .el-input__wrapper) {
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+:deep(.ws-doc__title-input .el-input__inner) {
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 34px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+}
+
+.ws-doc__meta {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+}
+
+.ws-doc__avatar {
+  background: rgba(168, 85, 247, 0.9);
+  color: #fff;
+}
+
+.ws-doc__meta-sep {
+  opacity: 0.55;
+}
+
+.ws-doc__editor {
+  margin-top: 10px;
+}
+
+:deep(.ws-doc__content .el-textarea__inner) {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--el-text-color-primary);
+}
+
 </style>

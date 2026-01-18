@@ -13,7 +13,7 @@ const DOCS_KEY = 'whale_space_docs'
 function normalizeDocs(input: unknown): DocEntity[] {
   if (!Array.isArray(input)) return []
   return input
-    .map((item) => {
+    .map((item): DocEntity | null => {
       if (!item || typeof item !== 'object') return null
       const obj = item as Partial<DocEntity>
       if (!obj.id || !obj.title) return null
@@ -24,6 +24,7 @@ function normalizeDocs(input: unknown): DocEntity[] {
         id: String(obj.id),
         title: String(obj.title),
         content: typeof obj.content === 'string' ? obj.content : '',
+        folderId: typeof obj.folderId === 'string' ? obj.folderId : null,
         createdAt,
         updatedAt,
         lastVisitedAt:
@@ -33,9 +34,9 @@ function normalizeDocs(input: unknown): DocEntity[] {
             : typeof obj.updatedAt === 'number'
               ? updatedAt
               : createdAt
-      } satisfies DocEntity
+      }
     })
-    .filter((x): x is DocEntity => Boolean(x))
+    .filter((x): x is DocEntity => x !== null)
 }
 
 export const docStorage = {
@@ -57,12 +58,13 @@ export const docStorage = {
   /**
    * 创建文档并写入存储（默认插入到列表头部）
    */
-  create(input: { title: string; content?: string }): DocEntity {
+  create(input: { title: string; content?: string; folderId?: string | null }): DocEntity {
     const now = Date.now()
     const doc: DocEntity = {
       id: createId('doc'),
       title: input.title,
       content: input.content ?? '',
+      folderId: input.folderId ?? null,
       createdAt: now,
       updatedAt: now,
       lastVisitedAt: now

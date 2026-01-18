@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { docStorage } from '../utils/docStorage'
+import { folderStorage } from '../utils/folderStorage'
 import type { DocEntity, DocId } from '../types/doc'
+import type { DocFolderEntity, DocFolderId } from '../types/docFolder'
 
 export const useDocsStore = defineStore('docs', () => {
   const docs = ref<DocEntity[]>([])
+  const folders = ref<DocFolderEntity[]>([])
 
   const sortedDocs = computed(() => {
     return [...docs.value].sort((a, b) => b.updatedAt - a.updatedAt)
@@ -16,12 +19,29 @@ export const useDocsStore = defineStore('docs', () => {
 
   function load() {
     docs.value = docStorage.loadAll()
+    folders.value = folderStorage.loadAll()
   }
 
-  function create(title = '未命名文档') {
-    const doc = docStorage.create({ title })
+  function create(title = '未命名文档', folderId: string | null = null) {
+    const doc = docStorage.create({ title, folderId })
     docs.value = docStorage.loadAll()
     return doc
+  }
+
+  function createFolder(name = '未命名文件夹', parentId: DocFolderId | null = null) {
+    const folder = folderStorage.create({ name, parentId })
+    folders.value = folderStorage.loadAll()
+    return folder
+  }
+
+  function renameFolder(id: DocFolderId, name: string) {
+    folderStorage.rename(id, name)
+    folders.value = folderStorage.loadAll()
+  }
+
+  function removeFolder(id: DocFolderId) {
+    folderStorage.remove(id)
+    folders.value = folderStorage.loadAll()
   }
 
   function rename(id: DocId, title: string) {
@@ -50,10 +70,14 @@ export const useDocsStore = defineStore('docs', () => {
 
   return {
     docs,
+    folders,
     sortedDocs,
     recentDocs,
     load,
     create,
+    createFolder,
+    renameFolder,
+    removeFolder,
     rename,
     updateContent,
     touchVisit,

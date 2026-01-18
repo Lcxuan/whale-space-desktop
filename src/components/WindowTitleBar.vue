@@ -9,7 +9,9 @@
           <div class="ws-titlebar__brand-sub">桌面端</div>
         </div>
       </div>
-      <div class="ws-titlebar__fill" data-tauri-drag-region />
+      <div class="ws-titlebar__fill" data-tauri-drag-region>
+        <Recents />
+      </div>
     </div>
 
     <div v-if="isTauri" class="ws-titlebar__actions">
@@ -37,6 +39,7 @@ import { computed } from 'vue'
 import { appWindow } from '@tauri-apps/api/window'
 import { Close, FullScreen, Minus } from '@element-plus/icons-vue'
 import ThemeToggle from './ThemeToggle.vue'
+import Recents from './Recents.vue'
 
 // 兼容“网页模式”(vite dev/preview) 与 “桌面模式”(Tauri)：
 // 非 Tauri 环境不渲染窗口控制按钮，也不调用 appWindow API
@@ -90,6 +93,9 @@ async function onClose() {
 .ws-titlebar__fill {
   flex: 1;
   height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .ws-titlebar__brand {
@@ -123,12 +129,12 @@ async function onClose() {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-right: 4px;
+  padding: 0 6px;
 }
 
 .ws-titlebar__btn {
-  width: 44px;
-  height: 100%;
+  width: 40px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -136,6 +142,7 @@ async function onClose() {
   background: transparent;
   cursor: pointer;
   color: var(--el-text-color-primary);
+  border-radius: 10px;
 }
 
 .ws-titlebar__btn:hover {
@@ -145,5 +152,20 @@ async function onClose() {
 .ws-titlebar__btn--danger:hover {
   background: var(--el-color-danger);
   color: var(--el-color-white);
+}
+
+.ws-titlebar__actions :deep(.el-button.is-circle) {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 10px;
+}
+
+.ws-titlebar__actions :deep(.el-button.is-circle .el-icon) {
+  font-size: 14px;
+}
+
+.ws-titlebar__btn :deep(.el-icon) {
+  font-size: 14px;
 }
 </style>

@@ -1,6 +1,6 @@
 <!-- 组件：主题切换按钮 -->
 <template>
-  <el-button :icon="icon" @click="onToggle" circle />
+  <el-button :icon="icon" @click="onToggle" circle size="small" />
 </template>
 
 <script setup lang="ts">
