@@ -64,7 +64,7 @@
       </div>
 
       <el-container>
-        <el-main :class="['ws-main', { 'ws-main--no-scroll': isHome }]">
+        <el-main :class="['ws-main', { 'ws-main--no-scroll': isHome, 'ws-main--flush-x': isEditor }]">
           <router-view />
         </el-main>
       </el-container>
@@ -118,6 +118,7 @@ const morePanelEl = ref<HTMLElement | null>(null)
 
 // 首页主区域不滚动，避免出现“内容区 + 内层滚动条”的双滚动体验
 const isHome = computed(() => route.name === 'home')
+const isEditor = computed(() => route.name === 'editor')
 
 // 页面标题：用于 header 展示，也可作为后续面包屑/路由元信息的兜底
 const title = computed(() => {
@@ -303,6 +304,14 @@ watch(
   position: relative;
   margin-top: 16px;
   padding-top: 16px;
+  --el-menu-item-height: 36px;
+  --el-menu-sub-item-height: 36px;
+}
+
+:deep(.ws-menu .ws-doclib-menu .el-menu-item),
+:deep(.ws-menu .ws-doclib-menu .el-sub-menu__title) {
+  font-size: 13px;
+  margin: 2px 0;
 }
 
 :deep(.ws-menu .ws-doclib-menu::before) {
@@ -332,15 +341,15 @@ watch(
 }
 
 :deep(.ws-menu .ws-doclib-root__plus) {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--el-text-color-regular);
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: 8px;
 }
 
 :deep(.ws-menu .ws-doclib-root__plus:hover) {
@@ -468,6 +477,10 @@ watch(
 .ws-main {
   padding: 0 16px 16px;
   min-height: 0;
+}
+
+.ws-main--flush-x {
+  padding: 0 0 16px;
 }
 
 .ws-main--no-scroll {
