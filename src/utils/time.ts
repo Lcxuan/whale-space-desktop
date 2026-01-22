@@ -2,7 +2,7 @@
  * 将时间戳格式化为可读字符串（yyyy-MM-dd HH:mm）
  * @param ms 时间戳（毫秒）
  */
-export function formatTime(ms: number) {
+export const formatTime = (ms: number) => {
   const d = new Date(ms)
   const yyyy = d.getFullYear()
   // 月份从 0 开始，需要 +1

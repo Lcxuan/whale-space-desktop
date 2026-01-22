@@ -12,7 +12,7 @@ const appStore = useAppStore()
 
 const icon = computed(() => (appStore.isDark ? Sunny : Moon))
 
-function onToggle() {
+const onToggle = () => {
   appStore.toggleTheme()
 }
 </script>

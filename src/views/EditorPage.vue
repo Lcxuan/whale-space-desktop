@@ -116,7 +116,7 @@ const content = ref('')
 const isSyncing = ref(false)
 const editorFontSize = ref(16)
 
-function getMarkdownOutput(inst: any) {
+const getMarkdownOutput = (inst: any) => {
   if (!inst) return ''
   if (typeof inst.getMarkdown === 'function') return inst.getMarkdown()
   if (inst.storage?.markdown && typeof inst.storage.markdown.getMarkdown === 'function') return inst.storage.markdown.getMarkdown()
@@ -151,7 +151,7 @@ const editor = useEditor({
   }
 })
 
-function syncFromStore() {
+const syncFromStore = () => {
   // 从 store 回放到编辑器本地状态；切换文档/刷新后需要重新同步
   const d = docsStore.getById(props.id)
   if (!d) return
@@ -225,7 +225,7 @@ watch(content, () => {
   persist()
 })
 
-function onTitleCommit() {
+const onTitleCommit = () => {
   if (!doc.value) return
   // 标题提交时做 trim，并兜底未命名
   docsStore.rename(doc.value.id, title.value.trim() || '未命名文档')
@@ -251,47 +251,47 @@ const blockLabel = computed(() => {
 const canUndo = computed(() => Boolean(editor.value?.can().chain().focus().undo().run()))
 const canRedo = computed(() => Boolean(editor.value?.can().chain().focus().redo().run()))
 
-function toggleBold() {
+const toggleBold = () => {
   editor.value?.chain().focus().toggleBold().run()
 }
 
-function toggleItalic() {
+const toggleItalic = () => {
   editor.value?.chain().focus().toggleItalic().run()
 }
 
-function toggleStrike() {
+const toggleStrike = () => {
   editor.value?.chain().focus().toggleStrike().run()
 }
 
-function toggleCode() {
+const toggleCode = () => {
   editor.value?.chain().focus().toggleCode().run()
 }
 
-function toggleUnderline() {
+const toggleUnderline = () => {
   editor.value?.chain().focus().toggleUnderline().run()
 }
 
-function toggleBulletList() {
+const toggleBulletList = () => {
   editor.value?.chain().focus().toggleBulletList().run()
 }
 
-function toggleOrderedList() {
+const toggleOrderedList = () => {
   editor.value?.chain().focus().toggleOrderedList().run()
 }
 
-function toggleBlockquote() {
+const toggleBlockquote = () => {
   editor.value?.chain().focus().toggleBlockquote().run()
 }
 
-function insertHr() {
+const insertHr = () => {
   editor.value?.chain().focus().setHorizontalRule().run()
 }
 
-function clearFormatting() {
+const clearFormatting = () => {
   editor.value?.chain().focus().unsetAllMarks().clearNodes().run()
 }
 
-function toggleLink() {
+const toggleLink = () => {
   if (!editor.value) return
   if (editor.value.isActive('link')) {
     editor.value.chain().focus().unsetLink().run()
@@ -302,7 +302,7 @@ function toggleLink() {
   editor.value.chain().focus().extendMarkRange('link').setLink({ href }).run()
 }
 
-function onBlockCommand(cmd: string) {
+const onBlockCommand = (cmd: string) => {
   if (!editor.value) return
   const chain = editor.value.chain().focus()
   if (cmd === 'p') chain.setParagraph().run()
@@ -311,17 +311,17 @@ function onBlockCommand(cmd: string) {
   else if (cmd === 'h3') chain.toggleHeading({ level: 3 }).run()
 }
 
-function onFontSizeCommand(cmd: string) {
+const onFontSizeCommand = (cmd: string) => {
   const next = Number(cmd)
   if (!Number.isFinite(next)) return
   editorFontSize.value = next
 }
 
-function undo() {
+const undo = () => {
   editor.value?.chain().focus().undo().run()
 }
 
-function redo() {
+const redo = () => {
   editor.value?.chain().focus().redo().run()
 }
 </script>

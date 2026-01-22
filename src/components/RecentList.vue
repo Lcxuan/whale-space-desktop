@@ -38,7 +38,7 @@ onMounted(() => {
 
 const items = computed(() => docsStore.recentDocs)
 
-function onOpen(row: DocEntity) {
+const onOpen = (row: DocEntity) => {
   // 打开前先记录一次“最近访问”，保证列表与时间戳及时刷新
   docsStore.touchVisit(row.id)
   router.push(`/editor/${row.id}`)

@@ -49,7 +49,7 @@ const folderSegments = computed(() => {
   return list
 })
 
-function formatDateCN(ms: number) {
+const formatDateCN = (ms: number) => {
   const d = new Date(ms)
   if (!Number.isFinite(d.getTime())) return ''
   const yyyy = d.getFullYear()

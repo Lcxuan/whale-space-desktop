@@ -45,17 +45,17 @@ import Recents from './Recents.vue'
 // 非 Tauri 环境不渲染窗口控制按钮，也不调用 appWindow API
 const isTauri = computed(() => Boolean((window as any).__TAURI__))
 
-async function onMinimize() {
+const onMinimize = async () => {
   if (!isTauri.value) return
   await appWindow.minimize()
 }
 
-async function onToggleMaximize() {
+const onToggleMaximize = async () => {
   if (!isTauri.value) return
   await appWindow.toggleMaximize()
 }
 
-async function onClose() {
+const onClose = async () => {
   if (!isTauri.value) return
   await appWindow.close()
 }

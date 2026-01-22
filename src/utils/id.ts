@@ -3,7 +3,7 @@
  * - 优先使用 crypto.randomUUID（更可靠）
  * - 低版本环境回退到 时间戳 + 随机数
  */
-export function createId(prefix = 'id') {
+export const createId = (prefix = 'id') => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return `${prefix}_${crypto.randomUUID()}`
   }

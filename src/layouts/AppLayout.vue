@@ -131,22 +131,22 @@ const title = computed(() => {
   return 'Whale Space'
 })
 
-function clamp(n: number, min: number, max: number) {
+const clamp = (n: number, min: number, max: number) => {
   return Math.min(max, Math.max(min, n))
 }
 
 // 切换“更多”弹窗显隐
-function toggleMore() {
+const toggleMore = () => {
   isMoreOpen.value = !isMoreOpen.value
 }
 
 // 点击弹窗内后跳转，并收起弹窗
-function goSettings() {
+const goSettings = () => {
   isMoreOpen.value = false
   router.push('/settings')
 }
 
-async function onRootCreateCommand(cmd: string) {
+const onRootCreateCommand = async (cmd: string) => {
   if (cmd === 'doc') {
     const title = await promptText('请输入文档标题', '新建文档', '未命名文档')
     if (!title) return
@@ -164,7 +164,7 @@ async function onRootCreateCommand(cmd: string) {
   }
 }
 
-async function promptText(message: string, title: string, inputValue: string) {
+const promptText = async (message: string, title: string, inputValue: string) => {
   const { value } = await ElMessageBox.prompt(message, title, {
     inputValue,
     confirmButtonText: '保存',
@@ -174,7 +174,7 @@ async function promptText(message: string, title: string, inputValue: string) {
 }
 
 // 全局捕获鼠标按下：点击弹窗/按钮之外的区域时，自动收起弹窗
-function onGlobalMouseDown(e: MouseEvent) {
+const onGlobalMouseDown = (e: MouseEvent) => {
   // 如果弹窗未打开，直接返回
   if (!isMoreOpen.value) return
   const target = e.target as Node | null
@@ -189,13 +189,12 @@ function onGlobalMouseDown(e: MouseEvent) {
 }
 
 // 拖拽侧栏时，统一设置全局光标与选中文本行为，避免拖动过程中误选中页面内容
-function setBodyResizing(active: boolean) {
+const setBodyResizing = (active: boolean) => {
   if (!document?.body) return
   document.body.style.cursor = active ? 'col-resize' : ''
   document.body.style.userSelect = active ? 'none' : ''
 }
-
-function onResizeStart(e: MouseEvent) {
+const onResizeStart = (e: MouseEvent) => {
   // 仅响应鼠标左键拖拽
   if (e.button !== 0) return
   e.preventDefault()

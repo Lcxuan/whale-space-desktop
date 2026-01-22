@@ -58,15 +58,15 @@ const childDocs = computed(() => {
     .sort((a, b) => b.updatedAt - a.updatedAt)
 })
 
-function folderIndex(id: string) {
+const folderIndex = (id: string) => {
   return `folder:${id}`
 }
 
-function onFolderCreateCommand(targetFolderId: string) {
+const onFolderCreateCommand = (targetFolderId: string) => {
   return (cmd: string) => onCreateCommand(cmd, targetFolderId)
 }
 
-async function onCreateCommand(cmd: string, targetFolderId: string) {
+const onCreateCommand = async (cmd: string, targetFolderId: string) => {
   if (cmd === 'doc') {
     const title = await promptText('请输入文档标题', '新建文档', '未命名文档')
     if (!title) return
@@ -84,7 +84,7 @@ async function onCreateCommand(cmd: string, targetFolderId: string) {
   }
 }
 
-async function promptText(message: string, title: string, inputValue: string) {
+const promptText = async (message: string, title: string, inputValue: string) => {
   const { value } = await ElMessageBox.prompt(message, title, {
     inputValue,
     confirmButtonText: '保存',

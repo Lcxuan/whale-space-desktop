@@ -4,7 +4,7 @@ import { createId } from './id'
 
 const FOLDERS_KEY = 'whale_space_doc_folders'
 
-function normalizeFolders(input: unknown): DocFolderEntity[] {
+const normalizeFolders = (input: unknown): DocFolderEntity[] => {
   if (!Array.isArray(input)) return []
   return input
     .map((item): DocFolderEntity | null => {
@@ -25,14 +25,14 @@ function normalizeFolders(input: unknown): DocFolderEntity[] {
 }
 
 export const folderStorage = {
-  loadAll(): DocFolderEntity[] {
+  loadAll: (): DocFolderEntity[] => {
     const raw = storage.get<unknown>(FOLDERS_KEY)
     return normalizeFolders(raw)
   },
-  saveAll(next: DocFolderEntity[]) {
+  saveAll: (next: DocFolderEntity[]) => {
     storage.set(FOLDERS_KEY, next)
   },
-  create(input: { name: string; parentId?: DocFolderId | null }): DocFolderEntity {
+  create: (input: { name: string; parentId?: DocFolderId | null }): DocFolderEntity => {
     const now = Date.now()
     const folder: DocFolderEntity = {
       id: createId('folder'),
@@ -41,13 +41,13 @@ export const folderStorage = {
       createdAt: now,
       updatedAt: now
     }
-    const folders = this.loadAll()
+    const folders = folderStorage.loadAll()
     folders.unshift(folder)
-    this.saveAll(folders)
+    folderStorage.saveAll(folders)
     return folder
   },
-  rename(id: DocFolderId, name: string) {
-    const folders = this.loadAll()
+  rename: (id: DocFolderId, name: string) => {
+    const folders = folderStorage.loadAll()
     const idx = folders.findIndex((f) => f.id === id)
     if (idx < 0) return
     folders[idx] = {
@@ -55,10 +55,10 @@ export const folderStorage = {
       name,
       updatedAt: Date.now()
     }
-    this.saveAll(folders)
+    folderStorage.saveAll(folders)
   },
-  remove(id: DocFolderId) {
-    const folders = this.loadAll().filter((f) => f.id !== id)
-    this.saveAll(folders)
+  remove: (id: DocFolderId) => {
+    const folders = folderStorage.loadAll().filter((f) => f.id !== id)
+    folderStorage.saveAll(folders)
   }
 }

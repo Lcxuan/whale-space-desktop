@@ -60,7 +60,7 @@ const docsStore = useDocsStore()
 
 type CreateKind = 'doc' | 'sheet' | 'board' | 'db'
 
-function createDoc(kind: CreateKind) {
+const createDoc = (kind: CreateKind) => {
   const defaultTitle =
     kind === 'sheet'
       ? '未命名表格'
@@ -76,11 +76,11 @@ function createDoc(kind: CreateKind) {
   router.push(`/editor/${doc.id}`)
 }
 
-function onCreateCommand(command: string | number | object) {
+const onCreateCommand = (command: string | number | object) => {
   createDoc(command as CreateKind)
 }
 
-function createKnowledgeBase() {
+const createKnowledgeBase = () => {
   ElMessage.info('知识库功能暂未实现')
 }
 </script>

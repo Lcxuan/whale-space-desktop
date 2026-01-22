@@ -17,7 +17,7 @@ export const useAppStore = defineStore('app', () => {
   /**
    * 设置窗口圆角
    */
-  function applyWindowRadius(px: number) {
+  const applyWindowRadius = (px: number) => {
     document.documentElement.style.setProperty('--ws-window-radius', `${px}px`)
   }
 
@@ -25,7 +25,7 @@ export const useAppStore = defineStore('app', () => {
    * 初始化窗口圆角：
    * - 桌面端：根据系统版本做差异化处理（例如 Windows 10/11）
    */
-  async function initWindowRadius() {
+  const initWindowRadius = async () => {
     // 桌面端需要根据系统差异处理窗口圆角
     const isTauri = Boolean((window as any).__TAURI__)
     if (!isTauri) {
@@ -58,7 +58,7 @@ export const useAppStore = defineStore('app', () => {
   /**
    * 应用主题
    */
-  function applyTheme(next: ThemeMode) {
+  const applyTheme = (next: ThemeMode) => {
     theme.value = next
     const root = document.documentElement
     root.classList.toggle('dark', next === 'dark')
@@ -68,14 +68,14 @@ export const useAppStore = defineStore('app', () => {
   /**
    * 切换主题
    */
-  function toggleTheme() {
+  const toggleTheme = () => {
     applyTheme(theme.value === 'dark' ? 'light' : 'dark')
   }
 
   /**
    * 应用启动初始化
    */
-  function init() {
+  const init = () => {
     const saved = storage.get<ThemeMode>(THEME_KEY)
     applyTheme(saved === 'dark' ? 'dark' : 'light')
     void initWindowRadius()
